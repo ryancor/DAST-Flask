@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Web/API Fuzzer</title>
+ 
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+ 
+ 
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="header">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#">Home</a>
+                    </li>
+                </ul>
+            </nav>
+			<br />
+            <h3 class="text-muted">Web/API Fuzzer</h3>
+        </div>
+ 
+        <div class="jumbotron">
+            <form action="." method="POST">
+				<input type="text" name="text"><br />
+				<input type="radio" name="options" id="GET" value="GET" checked=true> GET </input><br>
+				<input type="radio" name="options" id="POST" value="POST"> POST </input><br>
+				<input type="radio" name="options" id="PUT" value="PUT"> PUT </input><br>
+				<input type="radio" name="options" id="DELETE" value="DELETE"> DELETE </input><br>
+				<input type="submit" name="fuzz" value="Fuzz it!">
+			</form>
+            </p>
+        </div>
+ 
+        <div class="row marketing">
+            <div class="col-lg-6">
+                <h4>Fuzz</h4>
+                <p>Fuzz your endpoints here. Please use the '[]' as a parameter for injection.</p>
+				<p>Example: http://www.example.com/index.php?id=[]</p>
+            </div>
+        </div>
+ 
+        <footer class="footer">
+            <p>&copy; HackersClub 2017</p>
+        </footer>
+ 
+    </div>
+</body>
+ 
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <title>Web/API Fuzzer</title>
+ 
+ 
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+ 
+</head>
+
+<body>
+	<h3>Results Posted Here: {{results}}</h3>
+	<table>
+		{% for key in results['Results'] %}
+			<tr>
+				<th> {{ key }} </th>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+
+</html>
