@@ -1,6 +1,6 @@
 import time
 import requests
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request
 from services.injections import Injections
 
 app = Flask(__name__)
@@ -37,7 +37,7 @@ def fuzz_post():
 				data.setdefault("Results",[]).append([
 					request_case, 
 					new_ep, 
-					r.status_code
+					str(r.status_code)
 					]
 				)
 

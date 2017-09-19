@@ -16,7 +16,7 @@
 	<table>
 		{% for key in results['Results'] %}
 			<tr>
-				<th> {{ key }} </th>
+				<th> {{ ', '.join(key) }} </th>
 			</tr>
 		{% endfor %}
 	</table>
