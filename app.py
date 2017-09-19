@@ -48,8 +48,7 @@ def fuzz_post():
 		except Exception as error:
 			return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
   
-	results = json.dumps(data)
-	return render_template("results.html", results=results)
+	return render_template("results.html", results=data)
 
 if __name__ == '__main__':
 	app.run()
