@@ -12,7 +12,9 @@
 </head>
 
 <body>
-	<h3>Results Posted Here:</h3>
+	<h3><u>{{ results['Type'][0][0].replace('_', ' ').upper() }}</u>
+		Results Posted Here:
+	</h3>
 	<table>
 		{% for key in results['Results'] %}
 			<tr>

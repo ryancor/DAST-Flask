@@ -1,11 +1,4 @@
 class Injections():
-    def injection_options():
-        injection_type = input('\n[!] What type of injection do you want?\
-        (Options: SQL, Command, XSS, RCE, LDAP, LFI, Fuzzer, Full DAST, Url Snooper)\
-        \n-> ')
-
-        return injection_type
-
     def sql_injections():
         sql_injections = ['0x200', "' OR 'a'='a", '*/*', "') or \
         (SELECT admin FROM users WHERE admin = true AND ''='",

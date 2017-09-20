@@ -13,9 +13,27 @@ def main():
 def fuzz_post():
 	end_point = request.form['text']
 	request_case = request.form['options']
+	injection_case = request.form['i_options']
+	
+	i_types = []
+	if injection_case == 'sql_injections':
+		i_types.append(Injections.sql_injections())
+	elif injection_case == 'command_injections':
+		i_types.append(Injections.command_injections())
+	elif injection_case == 'xss_injections':
+		i_types.append(Injections.xss_injections())
+	elif injection_case == 'rce_injections':
+		i_types.append(Injections.rce_injections())
+	elif injection_case == 'ldap_injections':
+		i_types.append(Injections.ldap_injections())
+	elif injection_case == 'dast_scan':
+		i_types.append(Injections.dast_scan())
+	else:
+		i_types.append(Injections.url_snoop())
+	
 	data = {}
 	
-	for arr in Injections.sql_injections():
+	for arr in i_types[0]:
 		try:
 			time.sleep(1)
 
@@ -34,6 +52,10 @@ def fuzz_post():
 					return request_case
 					break
 				
+				data.setdefault("Type",[]).append([
+					injection_case
+					]
+				)
 				data.setdefault("Results",[]).append([
 					request_case, 
 					new_ep, 

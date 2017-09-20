@@ -29,10 +29,21 @@
         <div class="jumbotron">
             <form action="." method="POST">
 				<input type="text" name="text"><br />
+				<p>Request Types</p>
 				<input type="radio" name="options" id="GET" value="GET" checked=true> GET </input><br>
 				<input type="radio" name="options" id="POST" value="POST"> POST </input><br>
 				<input type="radio" name="options" id="PUT" value="PUT"> PUT </input><br>
 				<input type="radio" name="options" id="DELETE" value="DELETE"> DELETE </input><br>
+				<br />
+				<p>Injection Types</p>
+				<input type="radio" name="i_options" id="sql_injections" value="sql_injections" checked=true> SQL </input><br>
+				<input type="radio" name="i_options" id="command_injections" value="command_injections"> Command </input><br>
+				<input type="radio" name="i_options" id="xss_injections" value="xss_injections"> XSS </input><br>
+				<input type="radio" name="i_options" id="rce_injections" value="rce_injections"> Remote Code </input><br>
+				<input type="radio" name="i_options" id="ldap_injections" value="ldap_injections"> LDAP </input><br>
+				<input type="radio" name="i_options" id="dast_scan" value="dast_scan"> Full DAST </input><br>
+				<input type="radio" name="i_options" id="url_snoop" value="url_snoop"> URL Snooper </input><br>
+				<br />
 				<input type="submit" name="fuzz" value="Fuzz it!">
 			</form>
             </p>
