@@ -15,13 +15,16 @@
 	<h3><u>{{ results['Type'][0][0].replace('_', ' ').upper() }}</u>
 		Results Posted Here:
 	</h3>
-	<table>
-		{% for key in results['Results'] %}
-			<tr>
-				<th> {{ ', '.join(key) }} </th>
-			</tr>
-		{% endfor %}
-	</table>
+	{% for key in results['Results'] %}
+			{% if key[2] in ['200', '201', '204'] %}
+				<hr />
+				<p> {{ ', '.join(key) }} </p>
+				<p>Might be exploitable.</p>
+				<hr />
+			{% else %}
+				<p> {{ ', '.join(key) }} </p>
+			{% endif %}
+	{% endfor %}
 </body>
 
 </html>
