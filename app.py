@@ -1,9 +1,21 @@
 import time
 import requests
+from flaskext.mysql import MySQL
 from flask import Flask, render_template, request
 from services.injections import Injections
 
 app = Flask(__name__)
+
+mysql = MySQL()
+# MySQL configurations
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+app.config['MYSQL_DATABASE_DB'] = 'DastFuzz'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
+
+conn = mysql.connect()
+cursor = conn.cursor()
 
 @app.route('/')
 def main():
@@ -61,6 +73,10 @@ def fuzz_post():
 					new_ep, 
 					str(r.status_code)
 					]
+				)
+				
+				cursor.callproc('/c/Users/ryancor/Desktop/Exercises/SQL/sp_createFuzz',(
+					new_ep,str(r.status_code))
 				)
 
 			else:
