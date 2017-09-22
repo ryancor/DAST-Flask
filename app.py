@@ -75,9 +75,17 @@ def fuzz_post():
 					]
 				)
 				
-				cursor.callproc('/c/Users/ryancor/Desktop/Exercises/SQL/sp_createFuzz',(
-					new_ep,str(r.status_code))
-				)
+				#cursor.callproc('/c/SQL/sp_createFuzz',(
+				#	new_ep,str(r.status_code))
+				#)
+				
+				cursor.execute(
+					"""INSERT INTO 
+						tbl_fuzz (
+							url,
+							response_code)
+					VALUES (%s,%s)""", (new_ep, str(r.status_code)))
+				conn.commit()
 
 			else:
 				return '\n[-] Not fuzzable.'
