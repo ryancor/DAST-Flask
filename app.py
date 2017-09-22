@@ -44,12 +44,15 @@ def fuzz_post():
 		i_types.append(Injections.url_snoop())
 	
 	data = {}
+	badInput = ['<','>','--','script','/script']
+	
+	booTF = set(list(end_point)) & set(badInput)
 	
 	for arr in i_types[0]:
 		try:
 			time.sleep(1)
 
-			if '[]' in end_point:
+			if '[]' in end_point and len(booTF) == 0:
 				new_ep = end_point.replace('[]', arr)
 
 				if request_case == 'GET':
