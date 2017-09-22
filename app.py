@@ -76,15 +76,16 @@ def fuzz_post():
 				)
 				
 				#cursor.callproc('/c/SQL/sp_createFuzz',(
-				#	new_ep,str(r.status_code))
+				#	request_case,new_ep,str(r.status_code))
 				#)
 				
 				cursor.execute(
 					"""INSERT INTO 
 						tbl_fuzz (
+							request_type,
 							url,
 							response_code)
-					VALUES (%s,%s)""", (new_ep, str(r.status_code)))
+					VALUES (%s,%s,%s)""", (request_case, new_ep, str(r.status_code)))
 				conn.commit()
 
 			else:
