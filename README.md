@@ -1,4 +1,11 @@
 # DAST-Flask
-'''
-pip install flask && python app.py
-'''
+```
+pip install flask 
+pip install flask-mysql
+
+Create DB: DastFuzz
+Create Table: tbl_fuzz
+
+
+Run: python app.py
+```
