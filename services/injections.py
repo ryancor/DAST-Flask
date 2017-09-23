@@ -53,7 +53,9 @@ class Injections():
             "'UNION ALL SELECT username, password FROM members WHERE admin=1--'",
             "*/*","admin*)((|userpassword=*)",
             "page_location=crypts)(rank=*))(&(page_location=crypts",
-            "(&(USER = root)(&)","(&(cn=hacker)(cn=*))%00)(userPassword=[pass]))"]
+            "(&(USER = root)(&)","(&(cn=hacker)(cn=*))%00)(userPassword=[pass]))",
+            "http://www.attacker_site.com/attack_page", "userinput.txt",
+            "/WEB-INF/database/passwordDB"]
 
         return dast_scan
 
