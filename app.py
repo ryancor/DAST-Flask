@@ -21,6 +21,10 @@ cursor = conn.cursor()
 def main():
 	return render_template('index.html')
 	
+@app.route('/past_runs')
+def past_runs():
+	return render_template('runs.html')
+	
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
 	end_point = request.form['text']
