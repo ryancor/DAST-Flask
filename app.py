@@ -23,7 +23,14 @@ def main():
 	
 @app.route('/past_runs')
 def past_runs():
-	return render_template('runs.html')
+	query = """SELECT request_type, url, response_code 
+		FROM tbl_fuzz
+		ORDER BY id DESC"""
+	cursor.execute(query)
+	data = cursor.fetchall()
+	conn.close()
+	
+	return render_template('runs.html', data=data)
 	
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():

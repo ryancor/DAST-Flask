@@ -19,6 +19,19 @@
 
 <body>
 	<h3><u>Past Runs</u></h3>
+	<table border="1" cellpadding="5" cellspacing="5">
+		{% if data |length >= 1 %}
+			{% for row in data %}
+				<tr>
+				{% for d in row %}
+					<td>{{ d }}</td>
+				{% endfor %}
+				</tr>
+			{% endfor %}
+		{% else %}
+			<p>No data yet</p>
+		{% endif %}
+	</table>
 </body>
 
 </html>
