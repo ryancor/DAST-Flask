@@ -23,9 +23,14 @@ def main():
 	
 @app.route('/past_runs')
 def past_runs():
-	query = """SELECT request_type, url, response_code 
+	conn = mysql.connect()
+	cursor = conn.cursor()
+
+	query = """SELECT request_type, substring(url, 1, 120), 
+		response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
 		FROM tbl_fuzz
-		ORDER BY id DESC"""
+		WHERE created_at < DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+		ORDER BY created_at DESC"""
 	cursor.execute(query)
 	data = cursor.fetchall()
 	conn.close()

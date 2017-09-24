@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
     <title>Web/API Fuzzer</title>
- 
- 
+
+
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
- 
+
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
 	<nav>
 		<ul class="nav nav-pills pull-right">
@@ -18,9 +18,13 @@
 </head>
 
 <body>
-	<h3><u>Past Runs</u></h3>
+	<h3><u>Past Runs Today</u></h3>
 	<table border="1" cellpadding="5" cellspacing="5">
 		{% if data |length >= 1 %}
+			<th>Request</th>
+			<th>Fuzzed URL</th>
+			<th>Code</th>
+			<th>Run Time</th>
 			{% for row in data %}
 				<tr>
 				{% for d in row %}
