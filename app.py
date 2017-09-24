@@ -1,4 +1,5 @@
 import time
+import yaml
 import requests
 from flaskext.mysql import MySQL
 from flask import Flask, render_template, request
@@ -7,11 +8,15 @@ from services.injections import Injections
 app = Flask(__name__)
 
 mysql = MySQL()
+
+with open('passwords.yml') as f:
+    var = yaml.load(f)
+
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-app.config['MYSQL_DATABASE_DB'] = 'DastFuzz'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_USER'] = var['DB_USER']
+app.config['MYSQL_DATABASE_PASSWORD'] = var['DB_PASS']
+app.config['MYSQL_DATABASE_DB'] = var['DB_NAME']
+app.config['MYSQL_DATABASE_HOST'] = var['DB_HOST']
 mysql.init_app(app)
 
 conn = mysql.connect()
@@ -20,13 +25,13 @@ cursor = conn.cursor()
 @app.route('/')
 def main():
 	return render_template('index.html')
-	
+
 @app.route('/past_runs')
 def past_runs():
 	conn = mysql.connect()
 	cursor = conn.cursor()
 
-	query = """SELECT request_type, substring(url, 1, 120), 
+	query = """SELECT request_type, substring(url, 1, 120),
 		response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
 		FROM tbl_fuzz
 		WHERE created_at < DATE_ADD(CURDATE(), INTERVAL 1 DAY)
@@ -34,15 +39,15 @@ def past_runs():
 	cursor.execute(query)
 	data = cursor.fetchall()
 	conn.close()
-	
+
 	return render_template('runs.html', data=data)
-	
+
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
 	end_point = request.form['text']
 	request_case = request.form['options']
 	injection_case = request.form['i_options']
-	
+
 	i_types = []
 	if injection_case == 'sql_injections':
 		i_types.append(Injections.sql_injections())
@@ -58,12 +63,12 @@ def fuzz_post():
 		i_types.append(Injections.dast_scan())
 	else:
 		i_types.append(Injections.url_snoop())
-	
+
 	data = {}
 	badInput = ['<','>','--','script','/script']
-	
+
 	booTF = set(list(end_point)) & set(badInput)
-	
+
 	for arr in i_types[0]:
 		try:
 			time.sleep(1)
@@ -82,24 +87,20 @@ def fuzz_post():
 				else:
 					return request_case
 					break
-				
+
 				data.setdefault("Type",[]).append([
 					injection_case
 					]
 				)
 				data.setdefault("Results",[]).append([
-					request_case, 
-					new_ep, 
+					request_case,
+					new_ep,
 					str(r.status_code)
 					]
 				)
-				
-				#cursor.callproc('/c/SQL/sp_createFuzz',(
-				#	request_case,new_ep,str(r.status_code))
-				#)
-				
+
 				cursor.execute(
-					"""INSERT INTO 
+					"""INSERT INTO
 						tbl_fuzz (
 							request_type,
 							url,
@@ -113,7 +114,7 @@ def fuzz_post():
 
 		except Exception as error:
 			return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
-  
+
 	return render_template("results.html", results=data)
 
 if __name__ == '__main__':
