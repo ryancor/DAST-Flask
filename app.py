@@ -34,7 +34,7 @@ def past_runs():
 	query = """SELECT request_type, substring(url, 1, 120),
 		response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
 		FROM tbl_fuzz
-		WHERE created_at < DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+		WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 day)
 		ORDER BY created_at DESC"""
 	cursor.execute(query)
 	data = cursor.fetchall()
