@@ -26,21 +26,35 @@ cursor = conn.cursor()
 def main():
 	return render_template('index.html')
 
-@app.route('/past_runs')
+@app.route('/past_runs', methods=['GET', 'POST'])
 def past_runs():
-	conn = mysql.connect()
-	cursor = conn.cursor()
+    conn = mysql.connect()
+    cursor = conn.cursor()
 
-	query = """SELECT request_type, substring(url, 1, 120),
-		response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
-		FROM tbl_fuzz
-		WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 day)
-		ORDER BY created_at DESC"""
-	cursor.execute(query)
-	data = cursor.fetchall()
-	conn.close()
+    data = ""
 
-	return render_template('runs.html', data=data)
+    if request.method == 'GET':
+
+        query = """SELECT request_type, substring(url, 1, 120),
+		      response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
+              FROM tbl_fuzz
+              WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 day)
+              ORDER BY created_at DESC"""
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    elif request.method == 'POST':
+
+        query = """SELECT request_type, substring(url, 1, 120),
+		      response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
+              FROM tbl_fuzz
+              ORDER BY created_at DESC"""
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('runs.html', data=data)
 
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
