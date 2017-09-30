@@ -45,11 +45,12 @@ def past_runs():
 
     elif request.method == 'POST':
 
-        query = """SELECT request_type, substring(url, 1, 120),
-		      response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
-              FROM tbl_fuzz
-              ORDER BY created_at DESC"""
-        cursor.execute(query)
+        query = "SELECT request_type, substring(url, 1, 120),\
+              response_code, TIME_FORMAT(`created_at`, '%%H:%%i:%%s')\
+              FROM tbl_fuzz\
+              ORDER BY created_at DESC\
+              LIMIT %s"
+        cursor.execute(query, int(request.form['text']))
         data = cursor.fetchall()
 
     conn.close()
