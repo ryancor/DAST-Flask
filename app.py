@@ -26,6 +26,9 @@ cursor = conn.cursor()
 
 # File upload path
 UPLOAD_FOLDER = 'uploads'
+if not os.path.isdir(UPLOAD_FOLDER):
+    os.mkdir('uploads/')
+
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
