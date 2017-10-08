@@ -1,8 +1,10 @@
+import os
 import time
 import yaml
 import requests
 from flaskext.mysql import MySQL
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import secure_filename
 from services.injections import Injections
 
 app = Flask(__name__)
@@ -22,9 +24,15 @@ mysql.init_app(app)
 conn = mysql.connect()
 cursor = conn.cursor()
 
+# File upload path
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 @app.route('/')
 def main():
 	return render_template('index.html')
+
 
 @app.route('/past_runs', methods=['GET', 'POST'])
 def past_runs():
@@ -57,6 +65,7 @@ def past_runs():
 
     return render_template('runs.html', data=data)
 
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     data = ""
@@ -65,8 +74,9 @@ def upload():
         data
     elif request.method == 'POST':
         data
-        
+
     return render_template('upload.html', data=data)
+
 
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
