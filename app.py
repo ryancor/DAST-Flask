@@ -89,8 +89,16 @@ def upload():
             return redirect(request.url)
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             md5 = hashlib.md5(
                 open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
+
+            try:
+                import ssdeep
+                sdhash = ssdeep.hash_from_file('uploads/{0}'.format(filename))
+
+            except:
+                sdhash = 'NULL'
 
             cursor.execute(
                 """INSERT INTO
@@ -98,10 +106,9 @@ def upload():
                         file_name,
                         md5_hash,
                         ssdeep_hash)
-                VALUES (%s,%s,%s)""", (filename, md5, 'n/a'))
+                VALUES (%s,%s,%s)""", (filename, md5, sdhash))
             conn.commit()
-            # Redirect to different path for uniq hash sql data, find ssdeep
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Redirect to different path for uniq hash sql data
             return redirect(url_for('upload',
                                     filename=filename, uploaded="successful"))
 
