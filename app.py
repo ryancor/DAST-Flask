@@ -57,6 +57,17 @@ def past_runs():
 
     return render_template('runs.html', data=data)
 
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    data = ""
+
+    if request.method == 'GET':
+        data
+    elif request.method == 'POST':
+        data
+        
+    return render_template('upload.html', data=data)
+
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
 	end_point = request.form['text']
