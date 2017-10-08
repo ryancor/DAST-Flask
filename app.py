@@ -1,6 +1,7 @@
 import os
 import time
 import yaml
+import hashlib
 import requests
 from flaskext.mysql import MySQL
 from flask import Flask, flash, render_template, request, redirect, url_for
@@ -88,6 +89,18 @@ def upload():
             return redirect(request.url)
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            md5 = hashlib.md5(
+                open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
+
+            cursor.execute(
+                """INSERT INTO
+                    tbl_files (
+                        file_name,
+                        md5_hash,
+                        ssdeep_hash)
+                VALUES (%s,%s,%s)""", (filename, md5, 'n/a'))
+            conn.commit()
+            # Redirect to different path for uniq hash sql data, find ssdeep
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('upload',
                                     filename=filename, uploaded="successful"))
@@ -169,6 +182,7 @@ def fuzz_post():
 			return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
 
 	return render_template("results.html", results=data)
+
 
 if __name__ == '__main__':
     app.secret_key = var['SECRET_KEY']
