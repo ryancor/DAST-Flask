@@ -1,11 +1,31 @@
 <html>
+  <head>
+    <a href="/">Go Home</a>
+    <p>
+  </head>
    <body>
 
-      <form action = "/upload" method = "POST" 
+      <form action = "/upload" method = "POST"
          enctype = "multipart/form-data">
          <input type = "file" name = "file" />
          <input type = "submit"/>
       </form>
-
+      <table border="1" cellpadding="5" cellspacing="5">
+    		{% if data |length >= 1 %}
+    			<th>File Name</th>
+    			<th>MD5 Hash</th>
+    			<th>SSDEEP Hash</th>
+    			<th>Found At</th>
+    			{% for row in data %}
+    				<tr>
+    				{% for d in row %}
+    					<td>{{ d }}</td>
+    				{% endfor %}
+    				</tr>
+    			{% endfor %}
+    		{% else %}
+    			<p>No data yet</p>
+    		{% endif %}
+    	</table>
    </body>
 </html>

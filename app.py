@@ -76,7 +76,18 @@ def allowed_file(filename):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    if request.method == 'POST':
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    if request.method == 'GET':
+        query = """SELECT file_name, md5_hash, ssdeep_hash,
+                DATE_FORMAT(`created_at`, '%W, %M %e, %Y @ %h:%i %p')
+              FROM tbl_files
+              ORDER BY created_at DESC"""
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    elif request.method == 'POST':
         file = request.files['file']
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -112,7 +123,8 @@ def upload():
             return redirect(url_for('upload',
                                     filename=filename, uploaded="successful"))
 
-    return render_template('upload.html')
+    conn.close()
+    return render_template('upload.html', data=data)
 
 
 @app.route('/', methods=['GET','POST'])
