@@ -33,98 +33,10 @@ if not os.path.isdir(UPLOAD_FOLDER):
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 @app.route('/')
 def main():
 	return render_template('index.html')
-
-
-@app.route('/past_runs', methods=['GET', 'POST'])
-def past_runs():
-    conn = mysql.connect()
-    cursor = conn.cursor()
-
-    data = ""
-
-    if request.method == 'GET':
-
-        query = """SELECT request_type, substring(url, 1, 120),
-		      response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
-              FROM tbl_fuzz
-              WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 day)
-              ORDER BY created_at DESC"""
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-    elif request.method == 'POST':
-
-        query = "SELECT request_type, substring(url, 1, 120),\
-              response_code, TIME_FORMAT(`created_at`, '%%H:%%i:%%s')\
-              FROM tbl_fuzz\
-              ORDER BY created_at DESC\
-              LIMIT %s"
-        cursor.execute(query, int(request.form['text']))
-        data = cursor.fetchall()
-
-    conn.close()
-
-    return render_template('runs.html', data=data)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    conn = mysql.connect()
-    cursor = conn.cursor()
-
-    if request.method == 'GET':
-        query = """SELECT file_name, md5_hash, ssdeep_hash,
-                DATE_FORMAT(`created_at`, '%W, %M %e, %Y @ %h:%i %p')
-              FROM tbl_files
-              ORDER BY created_at DESC"""
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-    elif request.method == 'POST':
-        file = request.files['file']
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        elif file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        elif file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            md5 = hashlib.md5(
-                open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
-
-            try:
-                import ssdeep
-                sdhash = ssdeep.hash_from_file('uploads/{0}'.format(filename))
-
-            except:
-                sdhash = 'NULL'
-
-            cursor.execute(
-                """INSERT INTO
-                    tbl_files (
-                        file_name,
-                        md5_hash,
-                        ssdeep_hash)
-                VALUES (%s,%s,%s)""", (filename, md5, sdhash))
-            conn.commit()
-            # Redirect to different path for uniq hash sql data
-            return redirect(url_for('upload',
-                                    filename=filename, uploaded="successful"))
-
-    conn.close()
-    return render_template('upload.html', data=data)
 
 
 @app.route('/', methods=['GET','POST'])
@@ -201,6 +113,96 @@ def fuzz_post():
 			return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
 
 	return render_template("results.html", results=data)
+
+
+@app.route('/past_runs', methods=['GET', 'POST'])
+def past_runs():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    data = ""
+
+    if request.method == 'GET':
+
+        query = """SELECT request_type, substring(url, 1, 120),
+		      response_code, TIME_FORMAT(`created_at`, '%H:%i:%s')
+              FROM tbl_fuzz
+              WHERE created_at >= DATE_SUB(NOW(),INTERVAL 1 day)
+              ORDER BY created_at DESC"""
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    elif request.method == 'POST':
+
+        query = "SELECT request_type, substring(url, 1, 120),\
+              response_code, TIME_FORMAT(`created_at`, '%%H:%%i:%%s')\
+              FROM tbl_fuzz\
+              ORDER BY created_at DESC\
+              LIMIT %s"
+        cursor.execute(query, int(request.form['text']))
+        data = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('runs.html', data=data)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    if request.method == 'GET':
+        query = """SELECT file_name, md5_hash, ssdeep_hash, is_infected,
+                DATE_FORMAT(`created_at`, '%W, %M %e, %Y @ %h:%i %p')
+              FROM tbl_files
+              ORDER BY created_at DESC"""
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    elif request.method == 'POST':
+        file = request.files['file']
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        elif file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        elif file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            md5 = hashlib.md5(
+                open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
+
+            try:
+                import ssdeep
+                sdhash = ssdeep.hash_from_file('uploads/{0}'.format(filename))
+
+            except:
+                sdhash = 'NULL'
+
+            cursor.execute(
+                """INSERT INTO
+                    tbl_files (
+                        file_name,
+                        md5_hash,
+                        ssdeep_hash,
+                        is_infected)
+                VALUES (%s,%s,%s,%s)""", (filename, md5, sdhash, False))
+            conn.commit()
+            # Redirect to different path for uniq hash sql data
+            return redirect(url_for('upload',
+                                    filename=filename, uploaded="successful"))
+
+    conn.close()
+    return render_template('upload.html', data=data)
 
 
 if __name__ == '__main__':

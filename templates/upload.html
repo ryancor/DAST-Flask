@@ -15,11 +15,18 @@
     			<th>File Name</th>
     			<th>MD5 Hash</th>
     			<th>SSDEEP Hash</th>
+          <th>Infected</th>
     			<th>Found At</th>
     			{% for row in data %}
     				<tr>
     				{% for d in row %}
-    					<td>{{ d }}</td>
+              {% if d == 1 %}
+    					     <td>True</td>
+              {% elif d == 0 %}
+                   <td>False</td>
+              {% else %}
+                  <td>{{ d }}</td>
+              {% endif %}
     				{% endfor %}
     				</tr>
     			{% endfor %}
