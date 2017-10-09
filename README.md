@@ -1,7 +1,6 @@
 # DAST-Flask
 ```
-pip install flask
-pip install flask-mysql
+pip -r install requirements.txt
 
 Create DB: DastFuzz
 Create Table: tbl_fuzz
