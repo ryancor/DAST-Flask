@@ -155,9 +155,11 @@ def allowed_file(filename):
 def upload():
     conn = mysql.connect()
     cursor = conn.cursor()
+    data = ''
 
     if request.method == 'GET':
-        query = """SELECT file_name, md5_hash, ssdeep_hash, is_infected,
+        query = """SELECT file_name, md5_hash, sha1_hash, ssdeep_hash,
+                ssdeep_compare, is_infected,
                 DATE_FORMAT(`created_at`, '%W, %M %e, %Y @ %h:%i %p')
               FROM tbl_files
               ORDER BY created_at DESC"""
@@ -175,27 +177,36 @@ def upload():
         elif file.filename == '':
             flash('No selected file')
             return redirect(request.url)
+
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             md5 = hashlib.md5(
                 open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
+            sha1 = hashlib.sha1(
+                open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
 
             try:
                 import ssdeep
-                sdhash = ssdeep.hash_from_file('uploads/{0}'.format(filename))
+                ss_hash = ssdeep.hash_from_file(filename)
+                ss_hash_compare = ssdeep.compare(md5, sha1)
 
             except:
-                sdhash = 'NULL'
+                ss_hash = 'NULL'
+                ss_hash_compare = 0
 
             cursor.execute(
                 """INSERT INTO
                     tbl_files (
                         file_name,
                         md5_hash,
+                        sha1_hash,
                         ssdeep_hash,
+                        ssdeep_compare,
                         is_infected)
-                VALUES (%s,%s,%s,%s)""", (filename, md5, sdhash, False))
+                VALUES (%s,%s,%s,%s,%s,%s)""", (filename, md5, sha1, ss_hash,
+                    str(ss_hash_compare), False)
+                )
             conn.commit()
             # Redirect to different path for uniq hash sql data
             return redirect(url_for('upload',
