@@ -158,7 +158,7 @@ def upload():
     data = ''
 
     if request.method == 'GET':
-        query = """SELECT file_name, md5_hash, sha1_hash, ssdeep_hash,
+        query = """SELECT file_name, md5_hash, sha1_hash, sha256_hash, ssdeep_hash,
                 ssdeep_compare, is_infected,
                 DATE_FORMAT(`created_at`, '%W, %M %e, %Y @ %h:%i %p')
               FROM tbl_files
@@ -185,6 +185,8 @@ def upload():
                 open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
             sha1 = hashlib.sha1(
                 open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
+            sha256 = hashlib.sha256(
+                open('uploads/{0}'.format(filename), 'rb').read()).hexdigest()
 
             try:
                 import ssdeep
@@ -201,11 +203,12 @@ def upload():
                         file_name,
                         md5_hash,
                         sha1_hash,
+                        sha256_hash,
                         ssdeep_hash,
                         ssdeep_compare,
                         is_infected)
-                VALUES (%s,%s,%s,%s,%s,%s)""", (filename, md5, sha1, ss_hash,
-                    str(ss_hash_compare), False)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)""", (filename, md5, sha1, sha256,
+                    ss_hash, str(ss_hash_compare), False)
                 )
             conn.commit()
             # Redirect to different path for uniq hash sql data
