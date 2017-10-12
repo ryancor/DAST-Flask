@@ -7,6 +7,7 @@ from flaskext.mysql import MySQL
 from flask import Flask, flash, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from services.injections import Injections
+from api.virus_total import Call
 
 app = Flask(__name__)
 
@@ -196,6 +197,10 @@ def upload():
             except:
                 ss_hash = 'NULL'
                 ss_hash_compare = 0
+
+            # Start logic here for data insertion for is_infected
+            # x = Call('/a', 'a')
+            # x.check_hash()
 
             cursor.execute(
                 """INSERT INTO
