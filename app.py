@@ -199,8 +199,7 @@ def upload():
                 ss_hash_compare = 0
 
             # Start logic here for data insertion for is_infected
-            # x = Call('/a', 'a')
-            # x.check_hash()
+            infected = Call('/vtapi/v2/file/report', var['V_API_KEY'], md5)
 
             cursor.execute(
                 """INSERT INTO
@@ -213,7 +212,7 @@ def upload():
                         ssdeep_compare,
                         is_infected)
                 VALUES (%s,%s,%s,%s,%s,%s,%s)""", (filename, md5, sha1, sha256,
-                    ss_hash, str(ss_hash_compare), False)
+                    ss_hash, str(ss_hash_compare), infected.check_hash())
                 )
             conn.commit()
             # Redirect to different path for uniq hash sql data
