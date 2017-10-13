@@ -12,6 +12,7 @@ DB_PASS: 'example12'
 DB_NAME: 'DastFuzz'
 DB_HOST: 'localhost'
 SECRET_KEY: 'ABCD'
+V_API_KEY: 'VirusTotalAPI-Key'
 
 
 Run: python app.py
