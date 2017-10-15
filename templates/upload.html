@@ -22,15 +22,18 @@
     			<th>Found At</th>
     			{% for row in data %}
     				<tr>
-    				{% for d in row %}
-              {% if d == 1 %}
-    					     <td>True</td>
-              {% elif d == 0 %}
-                   <td>False</td>
-              {% else %}
-                  <td>{{ d }}</td>
-              {% endif %}
-    				{% endfor %}
+    				   <td>{{ row[0] }}</td>
+               <td>{{ row[1] }}</td>
+               <td>{{ row[2] }}</td>
+               <td>{{ row[3][:15] }}...</td>
+               <td>{{ row[4] }}</td>
+               <td>{{ row[5] }}</td>
+               {% if row[6] == 1 %}
+                 <td>True</td>
+               {% else %}
+                 <td>False</td>
+               {% endif %}
+               <td>{{ row[7] }}</td>
     				</tr>
     			{% endfor %}
     		{% else %}
