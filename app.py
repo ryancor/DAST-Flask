@@ -42,78 +42,83 @@ def main():
 
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
-	end_point = request.form['text']
-	request_case = request.form['options']
-	injection_case = request.form['i_options']
+    end_point = request.form['text']
+    request_case = request.form['options']
+    injection_case = request.form['i_options']
+    header = request.form['headers']
 
-	i_types = []
-	if injection_case == 'sql_injections':
-		i_types.append(Injections.sql_injections())
-	elif injection_case == 'command_injections':
-		i_types.append(Injections.command_injections())
-	elif injection_case == 'xss_injections':
-		i_types.append(Injections.xss_injections())
-	elif injection_case == 'rce_injections':
-		i_types.append(Injections.rce_injections())
-	elif injection_case == 'ldap_injections':
-		i_types.append(Injections.ldap_injections())
-	elif injection_case == 'dast_scan':
-		i_types.append(Injections.dast_scan())
-	else:
-		i_types.append(Injections.url_snoop())
+    i_types = []
+    if injection_case == 'sql_injections':
+    	i_types.append(Injections.sql_injections())
+    elif injection_case == 'command_injections':
+    	i_types.append(Injections.command_injections())
+    elif injection_case == 'xss_injections':
+    	i_types.append(Injections.xss_injections())
+    elif injection_case == 'rce_injections':
+    	i_types.append(Injections.rce_injections())
+    elif injection_case == 'ldap_injections':
+    	i_types.append(Injections.ldap_injections())
+    elif injection_case == 'dast_scan':
+    	i_types.append(Injections.dast_scan())
+    else:
+    	i_types.append(Injections.url_snoop())
 
-	data = {}
-	badInput = ['<','>','--','script','/script']
+    data = {}
+    badInput = ['<','>','--','script','/script']
 
-	booTF = set(list(end_point)) & set(badInput)
+    booTF = set(list(end_point)) & set(badInput)
 
-	for arr in i_types[0]:
-		try:
-			time.sleep(1)
+    for arr in i_types[0]:
+        try:
+            time.sleep(1)
 
-			if '[]' in end_point and len(booTF) == 0:
-				new_ep = end_point.replace('[]', arr)
+            if '[]' in end_point and len(booTF) == 0:
+                new_ep = end_point.replace('[]', arr)
+                if header:
+                    headers = {header.split(':')[0] : header.split(':')[1]}
+                else:
+                    headers = {}
 
-				if request_case == 'GET':
-					r = requests.get(new_ep)
-				elif request_case == 'POST':
-					r = requests.post(new_ep)
-				elif request_case == 'PUT':
-					r = requests.put(new_ep)
-				elif request_case == 'DELETE':
-					r = requests.delete(new_ep)
-				else:
-					return request_case
-					break
+                if request_case == 'GET':
+                    r = requests.get(new_ep, headers=headers)
+                elif request_case == 'POST':
+                    r = requests.post(new_ep, headers=headers)
+                elif request_case == 'PUT':
+                    r = requests.put(new_ep, headers=headers)
+                elif request_case == 'DELETE':
+                    r = requests.delete(new_ep, headers=headers)
+                else:
+                    return request_case
+                    break
 
-				data.setdefault("Type",[]).append([
-					injection_case
-					]
-				)
-				data.setdefault("Results",[]).append([
-					request_case,
-					new_ep,
-					str(r.status_code)
-					]
-				)
+                data.setdefault("Type",[]).append([
+                	injection_case
+                	]
+                )
+                data.setdefault("Results",[]).append([
+                	request_case,
+                	new_ep,
+                	str(r.status_code)
+                	]
+                )
 
-				cursor.execute(
-					"""INSERT INTO
-						tbl_fuzz (
-							request_type,
-							url,
-							response_code)
-					VALUES (%s,%s,%s)""", (request_case, new_ep, str(r.status_code)))
-				conn.commit()
+                cursor.execute(
+                	"""INSERT INTO
+                		tbl_fuzz (
+                			request_type,
+                			url,
+                			response_code)
+                	VALUES (%s,%s,%s)""", (request_case, new_ep, str(r.status_code)))
+                conn.commit()
 
-			else:
-				return '\n[-] Not fuzzable.'
-				break
+            else:
+            	return '\n[-] Not fuzzable.'
+            	break
 
-		except Exception as error:
-			return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
+        except Exception as error:
+        	return '\n[-] Could not make a successful request to that endpoint. {0}'.format(error)
 
-	return render_template("results.html", results=data)
+    return render_template("results.html", results=data)
 
 
 @app.route('/past_runs', methods=['GET', 'POST'])
