@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 mysql = MySQL()
 
-with open('passwords.yml') as f:
+with open('config/passwords.yml') as f:
     var = yaml.load(f)
 
 # MySQL configurations
