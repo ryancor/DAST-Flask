@@ -1,4 +1,5 @@
 import os
+import nltk
 import time
 import yaml
 import hashlib
@@ -8,6 +9,7 @@ from flask import Flask, flash, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from services.injections import Injections
 from api.virus_total import Call
+from nltk import word_tokenize
 
 app = Flask(__name__)
 
@@ -40,6 +42,18 @@ def main():
 	return render_template('index.html')
 
 
+## Tokenize Wording for Bad Inputs
+def get_all_containing_wrd(target_word, tar_passage, left_margin=10, right_margin=10):
+    tokens = nltk.word_tokenize(tar_passage)
+    text = nltk.Text(tokens)
+
+    c = nltk.ConcordanceIndex(text.tokens, key = lambda s: s.lower())
+    concordance_txt = ([text.tokens[list(map(lambda x: x-5 if (x-left_margin)>0
+                        else 0,[offset]))[0]:offset+right_margin]
+                        for offset in c.offsets(target_word)])
+
+    return [''.join([x+' ' for x in con_sub]) for con_sub in concordance_txt]
+
 @app.route('/', methods=['GET','POST'])
 def fuzz_post():
     end_point = request.form['text']
@@ -64,15 +78,13 @@ def fuzz_post():
     	i_types.append(Injections.url_snoop())
 
     data = {}
-    badInput = ['<','>','--','script','/script']
-
-    booTF = set(list(end_point)) & set(badInput)
+    results = get_all_containing_wrd('script', end_point)
 
     for arr in i_types[0]:
         try:
             time.sleep(1)
 
-            if '[]' in end_point and len(booTF) == 0:
+            if '[]' in end_point and len(results) == 0:
                 new_ep = end_point.replace('[]', arr)
                 if header:
                     headers = {header.split(':')[0] : header.split(':')[1]}
