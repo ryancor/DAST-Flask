@@ -6,13 +6,7 @@ Create DB: DastFuzz
 Create Table: tbl_fuzz
 Create Table 2: tbl_files
 
-Create 'Passwords.yml'
-DB_USER: 'admin'
-DB_PASS: 'example12'
-DB_NAME: 'DastFuzz'
-DB_HOST: 'localhost'
-SECRET_KEY: 'ABCD'
-V_API_KEY: 'VirusTotalAPI-Key'
+cp config/passwords.yml.example config/passwords.yml
 
 
 Run: python app.py
